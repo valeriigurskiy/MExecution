@@ -60,7 +60,7 @@ execution.single(() -> ormUtils.parse());
 ```
 Expected log: `[Execution time: 34ms] [Result: User: Pedro, Id: 312]`
 
-In case you don’t need to log result of executed method, just don’t call `printResult()` in the initialization chain ¯\\_(ツ)_/¯
+In case you don’t need to log result of executed method, just don’t call `printResult()` in the initialization chain :)
 
 ## `Execution` methods
 ```java
