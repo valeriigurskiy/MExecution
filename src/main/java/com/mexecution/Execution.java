@@ -1,5 +1,6 @@
 package com.mexecution;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -22,6 +23,12 @@ public class Execution {
 
     @SafeVarargs
     public final <T> void of(Callable<T>... callables) {
+        for (Callable<T> callable : callables) {
+            single(callable);
+        }
+    }
+
+    public final <T> void of(List<Callable<T>> callables) {
         for (Callable<T> callable : callables) {
             single(callable);
         }
