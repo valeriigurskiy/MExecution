@@ -27,7 +27,7 @@ Execution.create()
 ```
 
 ## Create (`com.mexecution.Execution.create()`)
-Create instance of Execution object
+Create instance of `Execution` object
 ```java
 Execution execution = Execution.create();
 ```
@@ -77,7 +77,7 @@ Result log: `[Execution time: 34ms] [Return: User: Pedro, Id: 312]`
 `Default value: false`
 
 ## Log time (`com.mexecution.Execution.logTime()`)
-Tells `Execution` object that нщг need to enable/disable logging of execution time for each passed `Callable`
+Tells `Execution` object that you need to enable/disable logging of execution time for each passed `Callable`
 ```java
 Execution execution = Execution
     .create()
