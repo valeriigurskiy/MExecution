@@ -48,14 +48,14 @@ Log sample: `[Execution time: 3123ms] [Start time: 1721609364111] [End time: 172
 * `TimeFormat.NANOSECONDS`
 
 Time format is responsible for format in which execution time will be displayed in the log
-```
+```java
 Execution execution = Execution
     .create()
     .timeFormat(TimeFormat.SECONDS)
     .of(() -> callAllMethods());
 ```
 Result: [Execution time: 4s]
-```
+```java
 execution
     .timeFormat(TimeFormat.NANOSECONDS)
     .of(() -> callAllMethods());
@@ -65,7 +65,7 @@ Result: [Execution time: 341ns]
 `Default value: MILLISECONDS`
 ## Log return (`com.mexecution.Execution.logReturn()`)
 By calling that method while `Execution` initialization you can controll that method must print result of callable method or not, example:
-```
+```java
 Execution execution = Execution
     .create()
     .logReturn(true);
