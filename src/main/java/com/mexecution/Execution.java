@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import static com.mexecution.ExecutionUtils.nullCheck;
+
 public class Execution {
     private static final Execution INSTANCE = new Execution();
 
@@ -18,6 +20,8 @@ public class Execution {
 
     private LogLevel logLevel = LogLevel.MIN;
 
+    private long totalTime = 0;
+
     private Execution() {
 
     }
@@ -26,50 +30,74 @@ public class Execution {
         return INSTANCE;
     }
 
-    @SafeVarargs
-    public final <T> void of(Callable<T>... callables) {
-        long totalTime = 0;
-        for (Callable<T> callable : callables) {
-            long executionTime = single(callable);
-            if (logTotalTime) {
-                totalTime += executionTime;
-            }
-        }
-        if (logTotalTime) {
-            String log = logTotalTime(totalTime);
-            System.out.println(log);
-        }
+    public final void ofVoid(Runnable... runnables) {
+        resetTotalTime();
+        nullCheck(runnables);
+
+        voidIterate(runnables);
+
+        logTotalTime();
     }
 
-    public final void of(List<Callable<?>> callables) {
-        long totalTime = 0;
+    public final void ofVoid(List<Runnable> runnables) {
+        nullCheck(runnables);
+        ofVoid(runnables.toArray(Runnable[]::new));
+    }
+
+    public final void of(Callable<?>... callables) {
+        resetTotalTime();
+        nullCheck(callables);
+
+        iterate(callables);
+
+        logTotalTime();
+    }
+
+    public final void of(Collection<Callable<?>> callables) {
+        nullCheck(callables);
+        of(callables.toArray(Callable[]::new));
+    }
+
+    private void iterate(Callable<?>[] callables) {
         for (Callable<?> callable : callables) {
-            long executionTime = single(callable);
-            if (logTotalTime) {
-                totalTime += executionTime;
-            }
-        }
-        if (logTotalTime) {
-            String log = logTotalTime(totalTime);
-            System.out.println(log);
+            single(callable);
         }
     }
 
-    public final <T> void of(Collection<Callable<T>> callables) {
-        long totalTime = 0;
-        for (Callable<T> callable : callables) {
-            long executionTime = single(callable);
-            if (logTotalTime) {
-                totalTime += executionTime;
-            }
-        }
-        if (logTotalTime) {
-            String log = logTotalTime(totalTime);
-            System.out.println(log);
+    private void voidIterate(Runnable[] runnables) {
+        for (Runnable runnable : runnables) {
+            voidSingle(runnable);
         }
     }
 
-    public <T> long single(Callable<T> callable) {
+    private void voidSingle(Runnable runnable) {
+        if (runnable == null) {
+            logError("Null runnable");
+            return;
+        }
+        try {
+            long startTime = System.currentTimeMillis();
+            runnable.run();
+            long endTime = System.currentTimeMillis();
+
+            if (logTime) {
+                String log = log(startTime, endTime, logLevel);
+                System.out.println(log);
+            }
+
+            if (logTotalTime) {
+                totalTime += endTime - startTime;
+            }
+        } catch (Exception e) {
+            logError(e.getMessage());
+        }
+    }
+
+    private <T> void single(Callable<T> callable) {
+        if (callable == null) {
+            logError("Null callable");
+            return;
+        }
         try {
             long startTime = System.currentTimeMillis();
             T call = callable.call();
@@ -80,12 +108,12 @@ public class Execution {
                 System.out.println(log);
             }
 
-            return endTime - startTime;
+            if (logTotalTime) {
+                totalTime += endTime - startTime;
+            }
         } catch (Exception e) {
-            String errorLog = logError(e.getMessage());
-            System.out.println(errorLog);
+            logError(e.getMessage());
         }
-        return 0;
     }
 
     public Execution logReturn(boolean logReturn) {
@@ -113,15 +141,18 @@ public class Execution {
         return this;
     }
 
-    private String logTotalTime(long totalTime) {
-        return String.format("[Total execution time: %s]", formatTime(totalTime));
+    private void logTotalTime() {
+        if (logTotalTime) {
+            System.out.printf("[Total execution time: %s]%n", formatTime(totalTime));
+        }
     }
 
-    private String logError(String errorMessage) {
-        return String.format("[Error message: %s]", errorMessage);
+    private void logError(String errorMessage) {
+        System.out.printf("[Error message: %s]%n", errorMessage);
     }
 
-    private <T> String log(long startTime, long endTime, LogLevel logLevel, T result) {
+    @SafeVarargs
+    private <T> String log(long startTime, long endTime, LogLevel logLevel, T... result) {
         StringBuilder formattedStringBuilder = new StringBuilder();
 
         if (logLevel == LogLevel.MIN) {
@@ -139,9 +170,10 @@ public class Execution {
         }
 
         if (logReturn) {
+            String resultMessage = result == null || result.length == 0 ? "" : result[0].toString();
             formattedStringBuilder
                     .append(" ")
-                    .append("[Return: ").append(result.toString()).append("]");
+                    .append("[Return: ").append(resultMessage).append("]");
         }
 
         return formattedStringBuilder.toString();
@@ -157,5 +189,9 @@ public class Execution {
         }
 
         return formattedStringBuilder.toString();
+    }
+
+    private void resetTotalTime() {
+        this.totalTime = 0;
     }
 }

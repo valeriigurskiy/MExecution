@@ -13,7 +13,7 @@ execution.logLevel(LogLevel.MAX);
 execution.logReturn(true);
 execution.timeFormat(TimeFormat.MILLISECONDS);
 
-execution.single(() -> ormUtils.parse());
+execution.ofVoid(() -> ormUtils.parse());
 ```
 ## Similar to:
 ```java
@@ -23,7 +23,13 @@ Execution.create()
     .logLevel(LogLevel.MAX)
     .logReturn(true)
     .timeFormat(TimeFormat.SECONDS)
-    .single(() -> ormUtils.parse());
+    .ofVoid(() -> ormUtils.parse());
+```
+
+## Create (`com.mexecution.Execution.create()`)
+Create instance of Execution object
+```java
+Execution execution = Execution.create();
 ```
 
 ## Log level (`com.mexecution.LogLevel`)
@@ -64,7 +70,7 @@ Execution execution = Execution
     .create()
     .logReturn(true);
 
-execution.single(() -> ormUtils.parse());
+execution.ofVoid(() -> ormUtils.parse());
 ```
 Result log: `[Execution time: 34ms] [Return: User: Pedro, Id: 312]`
 
@@ -113,8 +119,8 @@ Result:
 **[Total execution time: 141ms]**
 ## `Execution` methods
 ```java
-void single(Callable<T> callable) // Operates with single method
-void of(Callable<T>... callables) // Operates with array of methods
-void of(List<Callable<?>> callables) // Operates with list of methods
-void of(Collection<Callable<T>> callables) // Operates with collection of methods
+void ofVoid(Runnable... runnables) // Operates with array of void methods
+void ofVoid(List<Runnable> runnables) // Operates with list of void methods
+void of(Callable<?>... callables) // Operates with list of methods
+void of(Collection<Callable<?>> callables) // Operates with collection of methods
 ```
